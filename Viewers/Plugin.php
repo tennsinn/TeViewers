@@ -4,7 +4,7 @@
  * 
  * @package Viewers
  * @author 息E-敛
- * @version 0.4.0
+ * @version 0.5.0
  * @link http://tennsinn.com
  **/
  
@@ -82,9 +82,15 @@
 	 */
 	public static function addClicksNum($archive, $select)
 	{
-		$db = Typecho_Db::get();
-		$db->query($db->update('table.contents')->expression('clicksNum', 'clicksNum + 1')->where('cid = ?', $archive->stack[0]['cid']));
-		$db->query($db->update('table.contents')->rows(array('clicked' => Typecho_Date::gmtTime()))->where('cid = ?', $archive->stack[0]['cid']));
+		Typecho_Widget::widget('Widget_User')->to($user);
+		if(!$user->hasLogin() || $user->uid != $archive->stack[0]['authorId'])
+		{
+			$db = Typecho_Db::get();
+			$update = $db->update('table.contents')->where('cid = ?', $archive->stack[0]['cid']);
+			$update->expression('clicksNum', 'clicksNum + 1');
+			$update->expression('clicked', Typecho_Date::gmtTime());
+			$db->query($update);
+		}
 	}
 
 	/**
