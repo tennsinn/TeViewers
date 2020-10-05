@@ -13,12 +13,12 @@
 	/* 激活插件方法 */
 	public static function activate()
 	{
-		Typecho_Plugin::factory('Widget_Archive')->singleHandle = array('Viewers_Plugin', 'addHitsNum');
-		Typecho_Plugin::factory('Widget_Archive')->handleInit = array('Viewers_Plugin', 'reloadSelect');
+		Typecho_Plugin::factory('Widget_Archive')->singleHandle = array('Viewers_Plugin', 'addClicksNum');
+		Typecho_Plugin::factory('Widget_Archive')->handleInit = array('Viewers_Plugin', 'selectAll');
 
 		$db = Typecho_Db::get();
-		if (!array_key_exists('hitsNum', $db->fetchRow($db->select()->from('table.contents'))))
-			$db->query('ALTER TABLE `'. $db->getPrefix() .'contents` ADD `hitsNum` INT(10) DEFAULT 0;');
+		if (!array_key_exists('clicksNum', $db->fetchRow($db->select()->from('table.contents'))))
+			$db->query('ALTER TABLE `'. $db->getPrefix() .'contents` ADD `clicksNum` INT(10) DEFAULT 0;');
 	}
  
 	/* 禁用插件方法 */
@@ -78,17 +78,17 @@
 	 * 增加点击计数
 	 * @return void
 	 */
-	public static function addHitsNum($archive, $select)
+	public static function addClicksNum($archive, $select)
 	{
 		$db = Typecho_Db::get();
-		$db->query($db->update('table.contents')->expression('hitsNum', 'hitsNum + 1')->where('cid = ?', $archive->stack[0]['cid']));
+		$db->query($db->update('table.contents')->expression('clicksNum', 'clicksNum + 1')->where('cid = ?', $archive->stack[0]['cid']));
 	}
 
 	/**
 	 * 重载Select条件
 	 * @return void
 	 */
-	public static function reloadSelect($archive, $select)
+	public static function selectAll($archive, $select)
 	{
 		$select->select('*');
 	}
