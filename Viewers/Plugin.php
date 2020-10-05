@@ -1,10 +1,10 @@
 <?php
 /**
- * 读者墙
+ * 读者数据统计展示插件
  * 
  * @package Viewers
  * @author 息E-敛
- * @version 0.1.0
+ * @version 0.2.0
  * @link http://tennsinn.com
  **/
  
@@ -13,6 +13,11 @@
 	/* 激活插件方法 */
 	public static function activate()
 	{
+		Typecho_Plugin::factory('Widget_Archive')->singleHandle = array('Viewers_Plugin', 'addHitsNum');
+
+		$db = Typecho_Db::get();
+		if (!array_key_exists('hitsNum', $db->fetchRow($db->select()->from('table.contents'))))
+			$db->query('ALTER TABLE `'. $db->getPrefix() .'contents` ADD `hitsNum` INT(10) DEFAULT 0;');
 	}
  
 	/* 禁用插件方法 */
@@ -66,6 +71,16 @@
 			echo '</div>';
 		}
 		echo '</div><div class="clearFix"></div>';
+	}
+
+	/**
+	 * 点击计数
+	 * @return void
+	 */
+	public static function addHitsNum($archive, $select)
+	{
+		$db = Typecho_Db::get();
+		$db->query($db->update('table.contents')->expression('hitsNum', 'hitsNum + 1')->where('cid = ?', $archive->stack[0]['cid']));
 	}
 }
 ?>
