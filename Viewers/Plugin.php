@@ -4,7 +4,7 @@
  * 
  * @package Viewers
  * @author 息E-敛
- * @version 0.2.0
+ * @version 0.3.0
  * @link http://tennsinn.com
  **/
  
@@ -14,6 +14,7 @@
 	public static function activate()
 	{
 		Typecho_Plugin::factory('Widget_Archive')->singleHandle = array('Viewers_Plugin', 'addHitsNum');
+		Typecho_Plugin::factory('Widget_Archive')->handleInit = array('Viewers_Plugin', 'reloadSelect');
 
 		$db = Typecho_Db::get();
 		if (!array_key_exists('hitsNum', $db->fetchRow($db->select()->from('table.contents'))))
@@ -74,13 +75,22 @@
 	}
 
 	/**
-	 * 点击计数
+	 * 增加点击计数
 	 * @return void
 	 */
 	public static function addHitsNum($archive, $select)
 	{
 		$db = Typecho_Db::get();
 		$db->query($db->update('table.contents')->expression('hitsNum', 'hitsNum + 1')->where('cid = ?', $archive->stack[0]['cid']));
+	}
+
+	/**
+	 * 重载Select条件
+	 * @return void
+	 */
+	public static function reloadSelect($archive, $select)
+	{
+		$select->select('*');
 	}
 }
 ?>
