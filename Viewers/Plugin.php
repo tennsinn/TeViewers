@@ -4,7 +4,7 @@
  * 
  * @package Viewers
  * @author 息E-敛
- * @version 0.3.0
+ * @version 0.4.0
  * @link http://tennsinn.com
  **/
  
@@ -19,6 +19,8 @@
 		$db = Typecho_Db::get();
 		if (!array_key_exists('clicksNum', $db->fetchRow($db->select()->from('table.contents'))))
 			$db->query('ALTER TABLE `'. $db->getPrefix() .'contents` ADD `clicksNum` INT(10) DEFAULT 0;');
+		if (!array_key_exists('clicked', $db->fetchRow($db->select()->from('table.contents'))))
+			$db->query('ALTER TABLE `'. $db->getPrefix() .'contents` ADD `clicked` INT(10) DEFAULT 0;');
 	}
  
 	/* 禁用插件方法 */
@@ -82,6 +84,7 @@
 	{
 		$db = Typecho_Db::get();
 		$db->query($db->update('table.contents')->expression('clicksNum', 'clicksNum + 1')->where('cid = ?', $archive->stack[0]['cid']));
+		$db->query($db->update('table.contents')->rows(array('clicked' => Typecho_Date::gmtTime()))->where('cid = ?', $archive->stack[0]['cid']));
 	}
 
 	/**
