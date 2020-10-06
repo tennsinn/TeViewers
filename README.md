@@ -1,16 +1,23 @@
 # Viewers
 
-Typecho读者墙插件
+读者数据统计展示插件
+
+## Features
+
+- 提供文章、页面等独立页的点击计数功能以及该计数主题输出接口
 
 ## Instructions
 
-即插即用插件，使用`Viewers_Plugin::render($mode, $limit, $size);`模板输出读者墙
-* $mode=NULL：模板样式
-* $limit=NULL：人数上限
-* $size=40：头像大小
+### 独立页点击计数
 
-## Changelog
+即插即用，计数值存储于table.content中clicksNum字段，最后点击时间存储于clicked字段
 
-### 0.1.0
+### 主题计数输出
 
-* 实现基本功能
+点击计数值：
+
+	$this->clicksNum();
+
+最后点击时间：
+
+	$this->clicked();
