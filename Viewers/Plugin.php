@@ -1,10 +1,12 @@
 <?php
+if (!defined('__TYPECHO_ROOT_DIR__')) exit;
+
 /**
  * 读者数据统计展示插件
  * 
  * @package Viewers
  * @author 息E-敛
- * @version 0.5.0
+ * @version 0.5.1
  * @link http://tennsinn.com
  **/
  
