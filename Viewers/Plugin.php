@@ -6,7 +6,7 @@ if (!defined('__TYPECHO_ROOT_DIR__')) exit;
  * 
  * @package Viewers
  * @author 息E-敛
- * @version 0.5.1
+ * @version 0.5.2
  * @link http://tennsinn.com
  **/
  
@@ -85,10 +85,10 @@ if (!defined('__TYPECHO_ROOT_DIR__')) exit;
 	public static function addClicksNum($archive, $select)
 	{
 		Typecho_Widget::widget('Widget_User')->to($user);
-		if(!$user->hasLogin() || $user->uid != $archive->stack[0]['authorId'])
+		if(!$user->hasLogin() || $user->uid != $archive->authorId)
 		{
 			$db = Typecho_Db::get();
-			$update = $db->update('table.contents')->where('cid = ?', $archive->stack[0]['cid']);
+			$update = $db->update('table.contents')->where('cid = ?', $archive->cid);
 			$update->expression('clicksNum', 'clicksNum + 1');
 			$update->expression('clicked', Typecho_Date::gmtTime());
 			$db->query($update);
