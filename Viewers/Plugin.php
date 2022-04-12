@@ -1,4 +1,15 @@
 <?php
+
+namespace TypechoPlugin\Viewers;
+
+use Typecho\Plugin\PluginInterface;
+use Typecho\Db;
+use Typecho\Widget;
+use Typecho\Date;
+use Typecho\Common;
+use Typecho\Widget\Helper\Form;
+use Utils\Helper;
+
 if (!defined('__TYPECHO_ROOT_DIR__')) exit;
 
 /**
@@ -6,19 +17,19 @@ if (!defined('__TYPECHO_ROOT_DIR__')) exit;
  * 
  * @package Viewers
  * @author 息E-敛
- * @version 0.5.2
+ * @version 0.5.3
  * @link http://tennsinn.com
  **/
  
- class Viewers_Plugin implements Typecho_Plugin_Interface
+ class Plugin implements PluginInterface
  {
 	/* 激活插件方法 */
 	public static function activate()
 	{
-		Typecho_Plugin::factory('Widget_Archive')->singleHandle = array('Viewers_Plugin', 'addClicksNum');
-		Typecho_Plugin::factory('Widget_Archive')->handleInit = array('Viewers_Plugin', 'selectAll');
+		\Typecho\Plugin::factory('Widget_Archive')->singleHandle = array('Viewers_Plugin', 'addClicksNum');
+		\Typecho\Plugin::factory('Widget_Archive')->handleInit = array('Viewers_Plugin', 'selectAll');
 
-		$db = Typecho_Db::get();
+		$db = Db::get();
 		if (!array_key_exists('clicksNum', $db->fetchRow($db->select()->from('table.contents'))))
 			$db->query('ALTER TABLE `'. $db->getPrefix() .'contents` ADD `clicksNum` INT(10) DEFAULT 0;');
 		if (!array_key_exists('clicked', $db->fetchRow($db->select()->from('table.contents'))))
@@ -31,12 +42,12 @@ if (!defined('__TYPECHO_ROOT_DIR__')) exit;
 	}
 
 	/* 插件配置方法 */
-	public static function config(Typecho_Widget_Helper_Form $form)
+	public static function config(Form $form)
 	{
 	}
 
 	/* 个人用户的配置方法 */
-	public static function personalConfig(Typecho_Widget_Helper_Form $form)
+	public static function personalConfig(Form $form)
 	{
 	}
 
@@ -50,14 +61,14 @@ if (!defined('__TYPECHO_ROOT_DIR__')) exit;
 	public static function render($mode=NULL, $limit=NULL, $size=40)
 	{
 		$mode = $mode ? 'full' : 'brief';
-		$db = Typecho_Db::get();
+		$db = Db::get();
 		$query = $db->select('author', 'COUNT(author) AS num', 'url', 'mail')
 			->from('table.comments')
 			->where('authorId = ?', '0')
 			->where('type = ?', 'comment')
 			->where('status = ?', 'approved')
-			->group('author')
-			->order('num', Typecho_Db::SORT_DESC);
+			->group('author, mail, url')
+			->order('num', Db::SORT_DESC);
 		if($limit)
 			$query->limit($limit);
 		$Viewers = $db->fetchAll($query);
@@ -69,7 +80,7 @@ if (!defined('__TYPECHO_ROOT_DIR__')) exit;
 		{
 			echo '<div class="viewers_'.$mode.'_viewer">';
 			echo '<div class="viewers_'.$mode.'_avatar">';
-			echo '<a href="'.$Viewer['url'].'" title="'.$Viewer['author'].'" rel="nofollow"><img src="'.Typecho_Common::gravatarUrl($Viewer['mail'], $size, Helper::options()->commentsAvatarRating, NULL, NULL).'"></a></div>';
+			echo '<a href="'.$Viewer['url'].'" title="'.$Viewer['author'].'" rel="nofollow"><img src="'.Common::gravatarUrl($Viewer['mail'], $size, Helper::options()->commentsAvatarRating).'"></a></div>';
 			if($mode=='full')
 				echo '<span class="viewers_full_author">'.$Viewer['author'].'</span>';
 			echo '<span class="viewers_'.$mode.'_num">'.$Viewer['num'].'</span>';
@@ -84,13 +95,13 @@ if (!defined('__TYPECHO_ROOT_DIR__')) exit;
 	 */
 	public static function addClicksNum($archive, $select)
 	{
-		Typecho_Widget::widget('Widget_User')->to($user);
+		Widget::widget('Widget_User')->to($user);
 		if(!$user->hasLogin() || $user->uid != $archive->authorId)
 		{
-			$db = Typecho_Db::get();
+			$db = Db::get();
 			$update = $db->update('table.contents')->where('cid = ?', $archive->cid);
 			$update->expression('clicksNum', 'clicksNum + 1');
-			$update->expression('clicked', Typecho_Date::gmtTime());
+			$update->expression('clicked', Date::gmtTime());
 			$db->query($update);
 		}
 	}
