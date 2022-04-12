@@ -17,7 +17,7 @@ if (!defined('__TYPECHO_ROOT_DIR__')) exit;
  * 
  * @package Viewers
  * @author 息E-敛
- * @version 0.5.3
+ * @version 0.6.0
  * @link http://tennsinn.com
  **/
  
